@@ -106,7 +106,7 @@ def perform_test(input_size=2**10):
 
         tp = time.time()
         res1 = alg.fit(X, par=True)
-        times_p.append((time.time() - tp) * 0.8)
+        times_p.append((time.time() - tp))
 
     plt.plot([2**i for i in range(5,16)], times_s)
     plt.plot([2**i for i in range(5,16)], times_p)
