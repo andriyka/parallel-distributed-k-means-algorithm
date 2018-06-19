@@ -1,11 +1,15 @@
 import itertools
 import random
-import threading
+from multiprocessing import Process, Array, Manager
+import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 import numpy as np
+
+manager = Manager()
+
 
 class KMeansAlgorithm(object):
     def __init__(self, num_clusters, max_iter=1000, eps=0.001):
@@ -53,18 +57,18 @@ class KMeansAlgorithm(object):
         def get_centroids_local(chunk, rr, i):
             rr[i] = [np.argmin([np.sum(np.power(x - c, 2)) for c in centroids]) for x in chunk]
 
-        results = {}
+        results = manager.dict()
         chunks = np.split(X, 16)
 
-        threads = []
+        processes = []
 
         # Map
         for i, chunk in enumerate(chunks):
-            t = threading.Thread(target=get_centroids_local, args=(chunk, results, i))
+            t = mp.Process(target=get_centroids_local, args=(chunk, results, i))
             t.start()
-            threads.append(t)
+            processes.append(t)
 
-        for t in threads:
+        for t in processes:
             t.join()
 
         # Reduce
@@ -98,7 +102,7 @@ def perform_test(input_size=2**10):
     times_s = []
     times_p = []
 
-    for i in range(5, 16):
+    for i in range(5, 14):
         X = np.random.rand(2**i, 3)
         ts = time.time()
         res = alg.fit(X)
@@ -108,8 +112,8 @@ def perform_test(input_size=2**10):
         res1 = alg.fit(X, par=True)
         times_p.append((time.time() - tp))
 
-    plt.plot([2**i for i in range(5,16)], times_s)
-    plt.plot([2**i for i in range(5,16)], times_p)
+    plt.plot([2**i for i in range(5,14)], times_s)
+    plt.plot([2**i for i in range(5,14)], times_p)
 
     plt.legend(['seq', 'par'], loc='upper left')
     plt.show()
