@@ -98,11 +98,10 @@ class KMeansAlgorithm(object):
 def perform_test(input_size=2**10):
     alg = KMeansAlgorithm(8)
 
-
     times_s = []
     times_p = []
 
-    for i in range(5, 14):
+    for i in range(5, 16):
         X = np.random.rand(2**i, 3)
         ts = time.time()
         res = alg.fit(X)
@@ -112,8 +111,8 @@ def perform_test(input_size=2**10):
         res1 = alg.fit(X, par=True)
         times_p.append((time.time() - tp))
 
-    plt.plot([2**i for i in range(5,14)], times_s)
-    plt.plot([2**i for i in range(5,14)], times_p)
+    plt.plot([2**i for i in range(5,16)], times_s)
+    plt.plot([2**i for i in range(5,16)], times_p)
 
     plt.legend(['seq', 'par'], loc='upper left')
     plt.show()
